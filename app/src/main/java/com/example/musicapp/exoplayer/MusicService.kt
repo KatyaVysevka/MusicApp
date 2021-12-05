@@ -13,19 +13,20 @@ import com.example.musicapp.exoplayer.callbacks.MusicPlayerEventListener
 import com.example.musicapp.exoplayer.callbacks.MusicPlayerNotificationListener
 import com.example.musicapp.other.Constants.MEDIA_ROOT_ID
 import com.example.musicapp.other.Constants.NETWORK_ERROR
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 private const val SERVIСE_TAG = "MusicService"
 
@@ -84,10 +85,10 @@ class MusicService: MediaBrowserServiceCompat() {
         musicNotificationManager = MusicNotificationManager(
             this,
             mediaSession.sessionToken,
-            MusicPlayerNotificationListener(this)
-        ) {
-            curSongDuration = exoplayer.duration
-        }
+            MusicPlayerNotificationListener(this) {
+                curSongDuration = if (exoplayer.duration != C.TIME_UNSET) exoplayer.duration else 0
+            }
+        )
 
         val musicPlayBackPreparer = MusicPlayBackPreparer(musicSource){
             currentPlayingSong = it

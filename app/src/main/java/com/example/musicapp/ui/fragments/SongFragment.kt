@@ -19,9 +19,9 @@ import com.example.musicapp.other.Status
 import com.example.musicapp.ui.viewmodel.MainViewModel
 import com.example.musicapp.ui.viewmodel.SongViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_song.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.android.synthetic.main.fragment_song.ivSongIcon
 
 
 @AndroidEntryPoint

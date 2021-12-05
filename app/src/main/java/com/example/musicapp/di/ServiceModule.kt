@@ -21,15 +21,6 @@ object ServiceModule {
 
     @ServiceScoped
     @Provides
-    fun provideMusicDatabase(@ApplicationContext context: Context) =
-        MusicDatabase(
-            context.resources.openRawResource(
-                R.raw.playlist
-            ).bufferedReader().readText()
-        )
-
-    @ServiceScoped
-    @Provides
     fun provideAudioAttributes() = AudioAttributes.Builder()
         .setContentType(C.CONTENT_TYPE_MUSIC)
         .setUsage(C.USAGE_MEDIA)

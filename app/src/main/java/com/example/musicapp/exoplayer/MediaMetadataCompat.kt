@@ -10,7 +10,7 @@ fun MediaMetadataCompat.toSong(): Song? {
             it.description.toString(),
             it.iconUri.toString(),
             it.mediaUri.toString(),
-            it.describeContents()
+            //it.describeContents()
         )
     }
 }
