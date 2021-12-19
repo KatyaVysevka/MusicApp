@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import com.bumptech.glide.Glide
@@ -14,12 +15,12 @@ import com.example.musicapp.other.Constants.NOTIFICATION_CHANNEL_ID
 import com.example.musicapp.other.Constants.NOTIFICATION_ID
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import java.lang.ref.WeakReference
 
 class MusicNotificationManager (
     private val context: Context,
     sessionToken: MediaSessionCompat.Token,
     notificationListener: PlayerNotificationManager.NotificationListener,
-    private val newSongCallback: () -> Unit
 ) {
 
     private var notificationManager: PlayerNotificationManager
@@ -49,6 +50,9 @@ class MusicNotificationManager (
         private val mediaController: MediaControllerCompat
     ): PlayerNotificationManager.MediaDescriptionAdapter {
 
+        private var currentBitmapArtwork: Uri? = null
+        private var currentBitmapRef: WeakReference<Bitmap> = WeakReference(null)
+
         override fun getCurrentContentTitle(player: Player): CharSequence {
             return mediaController.metadata.description.title.toString()
         }
@@ -65,19 +69,30 @@ class MusicNotificationManager (
             player: Player,
             callback: PlayerNotificationManager.BitmapCallback
         ): Bitmap? {
-            Glide.with(context).asBitmap()
-                .load(mediaController.metadata.description.iconUri)
-                .into(object: CustomTarget<Bitmap>() {
-                    override fun onResourceReady(
-                        resource: Bitmap,
-                        transition: Transition<in Bitmap>?
-                    ) {
-                        callback.onBitmap(resource)
-                    }
+            val bitmap = currentBitmapRef.get()
+            val iconUri = mediaController.metadata.description.iconUri
 
-                    override fun onLoadCleared(placeholder: Drawable?) = Unit
-                })
-            return null
+            if (currentBitmapArtwork != null && currentBitmapArtwork == iconUri && bitmap != null) {
+                return bitmap
+            }
+
+            return iconUri?.let { uri ->
+                Glide.with(context).asBitmap()
+                    .load(uri)
+                    .into(object: CustomTarget<Bitmap>() {
+                        override fun onResourceReady(
+                            resource: Bitmap,
+                            transition: Transition<in Bitmap>?
+                        ) {
+                            callback.onBitmap(resource)
+                            currentBitmapArtwork = uri
+                            currentBitmapRef = WeakReference(resource)
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) = Unit
+                    })
+                null
+            }
         }
     }
 }

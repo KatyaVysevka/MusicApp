@@ -9,6 +9,7 @@ import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ARTIST
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI
+import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_URI
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
@@ -17,10 +18,8 @@ import com.example.musicapp.data.MusicDatabase
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.InternalCoroutinesApi
 
 class MusicSource @Inject constructor(
     private val musicDatabase: MusicDatabase
@@ -29,7 +28,7 @@ class MusicSource @Inject constructor(
     var songs = emptyList<MediaMetadataCompat>()
 
     @InternalCoroutinesApi
-    suspend fun fetchMediaData() = withContext(Dispatchers.IO) {
+    suspend fun fetchMediaData() {
         state = State.STATE_INITIALIZING
         val allSongs = musicDatabase.getAllSongs()
         songs = allSongs.map { song ->
@@ -38,6 +37,7 @@ class MusicSource @Inject constructor(
                 .putString(METADATA_KEY_TITLE, song.title)
                 .putString(METADATA_KEY_MEDIA_ID, song.title)
                 .putString(METADATA_KEY_DISPLAY_TITLE, song.title)
+                .putString(METADATA_KEY_DISPLAY_SUBTITLE, song.artist)
                 .putString(METADATA_KEY_DISPLAY_ICON_URI, song.bitmapUri)
                 .putString(METADATA_KEY_MEDIA_URI, song.trackUri)
                 .putString(METADATA_KEY_ALBUM_ART_URI, song.bitmapUri)

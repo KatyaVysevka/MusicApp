@@ -8,7 +8,8 @@ import com.example.musicapp.other.Constants.NOTIFICATION_ID
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 
 class MusicPlayerNotificationListener (
-    private val musicService: MusicService
+    private val musicService: MusicService,
+    private val newSongCallback: () -> Unit
 ): PlayerNotificationManager.NotificationListener {
     override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
         super.onNotificationCancelled(notificationId, dismissedByUser)
@@ -25,6 +26,7 @@ class MusicPlayerNotificationListener (
         ongoing: Boolean
     ) {
         super.onNotificationPosted(notificationId, notification, ongoing)
+        newSongCallback()
         musicService.apply {
             if(ongoing && !isForegroundService) {
                 ContextCompat.startForegroundService(
